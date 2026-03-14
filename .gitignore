@@ -1,0 +1,27 @@
+# ==========================================
+# Fichier .gitignore - Sécurité du Homelab
+# ==========================================
+
+# 1. Ignorer les fichiers contenant des secrets, mots de passe et certificats
+.env
+*.env
+secret/
+credentials/
+*.pem
+*.key
+
+# 2. Ignorer les logs système pour ne pas polluer le dépôt
+System_Logs/
+*.log
+
+# 3. Ignorer les grosses archives de backup et images disques
+*.tar.gz
+*.iso
+*.img
+*.vmdk
+*.qcow2
+
+# 4. Dossiers spécifiques à ignorer (ex: bases de données locales si tu synchronises un dossier entier)
+postgres_data/
+grafana_data/
+prometheus_data/
