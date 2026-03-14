@@ -1,0 +1,81 @@
+version: '3.8'
+
+# ==============================================================================
+# Stack : Domotique, IoT & Automatisation (Pi 5)
+# Services : Home Assistant, n8n, Zigbee2MQTT, ESPHome, Mosquitto, Matter
+# ==============================================================================
+
+services:
+  homeassistant:
+    image: lscr.io/linuxserver/homeassistant:latest
+    container_name: homeassistant
+    network_mode: host
+    restart: unless-stopped
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=${TIMEZONE} # Ex: America/Toronto
+    volumes:
+      - ./ha_config:/config
+
+  mosquitto:
+    image: eclipse-mosquitto:latest
+    container_name: mosquitto
+    restart: unless-stopped
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    volumes:
+      - ./mosquitto/config:/mosquitto/config
+      - ./mosquitto/data:/mosquitto/data
+      - ./mosquitto/log:/mosquitto/log
+
+  zigbee2mqtt:
+    image: koenkk/zigbee2mqtt:latest
+    container_name: zigbee2mqtt
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./z2m_data:/app/data
+      - /run/udev:/run/udev:ro
+    devices:
+      # Remplacer par le chemin réel de ta clé Zigbee (ex: /dev/ttyACM0)
+      - ${ZIGBEE_DONGLE_PATH}:/dev/ttyACM0
+    depends_on:
+      - mosquitto
+
+  n8n:
+    image: docker.n8n.io/n8nio/n8n:latest
+    container_name: n8n
+    restart: unless-stopped
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_HOST=${N8N_DOMAIN}
+      - VUE_APP_URL_BASE_API=${N8N_DOMAIN}
+      - WEBHOOK_URL=https://${N8N_DOMAIN}/
+      - GENERIC_TIMEZONE=${TIMEZONE}
+    volumes:
+      - n8n_data:/home/node/.n8n
+
+  esphome:
+    image: esphome/esphome:latest
+    container_name: esphome
+    network_mode: host
+    restart: unless-stopped
+    volumes:
+      - ./esphome_config:/config
+      - /etc/localtime:/etc/localtime:ro
+
+  matter-server:
+    image: ghcr.io/home-assistant-libs/python-matter-server:stable
+    container_name: matter-server
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - ./matter_data:/data
+      - /run/dbus:/run/dbus:ro
+
+volumes:
+  n8n_data:
