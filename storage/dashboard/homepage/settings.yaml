@@ -1,0 +1,44 @@
+# ==============================================================================
+# Configuration Type : Homepage (Dashboard d'administration)
+# Hébergé sur le Raspberry Pi Zero 2 (Réseau Tailscale)
+# ==============================================================================
+
+title: "Tour de Contrôle - Homelab"
+theme: dark
+layout:
+  Proxmox Cluster:
+    style: row
+    columns: 2
+  Docker Stack (Pi 5):
+    style: row
+    columns: 3
+
+services:
+  - Proxmox Cluster:
+      - pve-lumanova:
+          icon: proxmox
+          href: https://pve-lumanova.tailnet.ts.net:8006
+          description: "Hyperviseur Principal (i3-6100U)"
+      - pve-cerbere:
+          icon: proxmox
+          href: https://pve-cerbere.tailnet.ts.net:8006
+          description: "Hyperviseur Secondaire (i3-4150T)"
+
+  - Sécurité & Réseau:
+      - OPNsense:
+          icon: opnsense
+          href: https://opnsense.tailnet.ts.net
+      - Technitium DNS:
+          icon: dns
+          href: http://dns.tailnet.ts.net:5380
+      - Nginx Proxy Manager:
+          icon: nginx
+          href: https://npm.tailnet.ts.net:81
+
+  - Observabilité:
+      - Grafana:
+          icon: grafana
+          href: http://pi5.tailnet.ts.net:3000
+      - Uptime Kuma:
+          icon: uptime-kuma
+          href: http://pi5.tailnet.ts.net:3001
